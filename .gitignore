@@ -1,0 +1,42 @@
+# Build outputs
+*.gb
+*.gbc
+*.o
+*.lst
+*.sym
+*.map
+*.noi
+*.rel
+*.asm
+*.ihx
+
+# GBDK generated
+*.adb
+
+# Asset generated C files (keep manually created tiles.c and tiles.h)
+# Only ignore PNG-converted files
+assets/sprites/*.c
+assets/sprites/*.h
+assets/fonts/*.c
+assets/fonts/*.h
+
+# Generated puzzle C files
+data/*.c
+
+# Editors
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# Save states from emulators
+*.sav
+*.sgm
+*.state
+
+# ROM files (build output)
+*.pocket

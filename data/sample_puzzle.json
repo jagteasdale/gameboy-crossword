@@ -1,0 +1,41 @@
+{
+    "title": "Sample Cryptic",
+    "author": "Anonymous",
+    "grid": [
+        "RADIAL#########",
+        "#A#I###########",
+        "#D#A###########",
+        "#I#L###########",
+        "#A#############",
+        "#L#############",
+        "###############",
+        "###############",
+        "###############",
+        "###############",
+        "###############",
+        "###############",
+        "###############",
+        "###############",
+        "###############"
+    ],
+    "across": [
+        {
+            "number": 1,
+            "clue": "Poorly made dial turned out to be not digital (6)",
+            "answer": "RADIAL"
+        }
+    ],
+    "down": [
+        {
+            "number": 1,
+            "clue": "Emit waves from communication device (5)",
+            "answer": "RADIATE"
+        },
+        {
+            "number": 2,
+            "clue": "Used in court, it rings when you dial (5)",
+            "answer": "TRIAL"
+        }
+    ],
+    "notes": "This is a minimal sample puzzle for testing. Replace with full 15x15 puzzles."
+}
