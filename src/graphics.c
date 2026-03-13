@@ -39,8 +39,8 @@ uint8_t char_to_tile(char c) {
 }
 
 void graphics_init(void) {
-    // Set up LCD
-    LCDC_REG = LCDCF_ON | LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON;
+    // Turn display OFF during VRAM setup
+    DISPLAY_OFF;
 
     // Set palettes (lightest to darkest)
     // 11 10 01 00 = white, light gray, dark gray, black
@@ -48,7 +48,7 @@ void graphics_init(void) {
     OBP0_REG = 0xE4;  // Sprite palette 0
     OBP1_REG = 0xD2;  // Sprite palette 1 (alternate)
 
-    // Load tiles
+    // Load tiles while display is off
     graphics_load_tiles();
 
     // Clear screen buffer
@@ -57,6 +57,9 @@ void graphics_init(void) {
             screen_buffer[y][x] = TILE_SPACE;
         }
     }
+
+    // Set up LCD control (display still off, enabled by main)
+    LCDC_REG = LCDCF_BG8000 | LCDCF_BG9800 | LCDCF_BGON | LCDCF_OBJ8 | LCDCF_OBJON;
 }
 
 void graphics_load_tiles(void) {
