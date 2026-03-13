@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Boy Crossword</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            color: #eee;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #9db4c0;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .controls kbd {
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            border: 1px solid #555;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 640px;
+            aspect-ratio: 160 / 144;
+        }
+
+        .info {
+            margin-top: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .info a {
+            color: #9db4c0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Game Boy Crossword</h1>
+
+    <div class="controls">
+        <p>
+            <kbd>Arrow keys</kbd> navigate |
+            <kbd>Z</kbd> = A (select) |
+            <kbd>X</kbd> = B (back/delete) |
+            <kbd>Enter</kbd> = Start |
+            <kbd>Shift</kbd> = Select
+        </p>
+    </div>
+
+    <div id="game-container"></div>
+
+    <div class="info">
+        <p>A 15x15 cryptic crossword for the original Game Boy</p>
+        <p><a href="https://github.com/jagteasdale/gameboy-crossword">View source on GitHub</a></p>
+    </div>
+
+    <script>
+        EJS_player = '#game-container';
+        EJS_core = 'gambatte';
+        EJS_gameUrl = 'crossword.gb';
+        EJS_gameName = 'Crossword';
+        EJS_color = '#1a1a2e';
+        EJS_startOnLoaded = true;
+        EJS_pathtodata = 'https://cdn.emulatorjs.org/stable/data/';
+    </script>
+    <script src="https://cdn.emulatorjs.org/stable/data/loader.js"></script>
+</body>
+</html>
