@@ -12,6 +12,10 @@ static Puzzle current_puzzle;
 static Cursor cursor;
 static ViewOffset view_offset;
 
+// Clue-first navigation state
+static uint8_t current_clue_index;  // Index into across_clues or down_clues
+static uint8_t word_offset;         // Position within current word (0 = first letter)
+
 // Menu state
 static uint8_t menu_selection;
 
@@ -28,9 +32,11 @@ static void handle_paused_state(void);
 static void handle_complete_state(void);
 
 // Helper functions
-static void move_cursor(int8_t dx, int8_t dy);
+static void update_cursor_from_clue(void);
+static void next_clue(void);
+static void prev_clue(void);
+static void move_in_word(int8_t delta);
 static void toggle_direction(void);
-static void advance_cursor(void);
 static const Clue* get_current_clue(void);
 static void enter_letter(uint8_t letter);
 static void delete_letter(void);
@@ -42,6 +48,8 @@ void game_init(void) {
     cursor.dir = DIR_ACROSS;
     view_offset.x = 0;
     view_offset.y = 0;
+    current_clue_index = 0;
+    word_offset = 0;
     menu_selection = 0;
     letter_input_selection = 0;
 
@@ -77,22 +85,15 @@ void game_update(void) {
 void game_load_puzzle(uint8_t puzzle_index) {
     puzzles_init_player_grid(&current_puzzle, puzzle_index);
 
-    // Find first non-black cell for cursor
-    cursor.x = 0;
-    cursor.y = 0;
-    for (uint8_t y = 0; y < GRID_HEIGHT; y++) {
-        for (uint8_t x = 0; x < GRID_WIDTH; x++) {
-            if (current_puzzle.grid[y][x].solution != CELL_BLACK) {
-                cursor.x = x;
-                cursor.y = y;
-                goto found;
-            }
-        }
-    }
-found:
+    // Start at first across clue
     cursor.dir = DIR_ACROSS;
+    current_clue_index = 0;
+    word_offset = 0;
     view_offset.x = 0;
     view_offset.y = 0;
+
+    // Set cursor position from current clue
+    update_cursor_from_clue();
 
     // Draw initial grid
     graphics_draw_grid(&current_puzzle, &view_offset);
@@ -162,24 +163,26 @@ static void handle_menu_state(void) {
 static void handle_playing_state(void) {
     uint8_t old_x = cursor.x;
     uint8_t old_y = cursor.y;
-    uint8_t cursor_moved = 0;
+    uint8_t needs_redraw = 0;
 
-    // D-pad movement
+    // UP/DOWN - cycle through clues
     if (input_just_pressed(J_UP)) {
-        move_cursor(0, -1);
-        cursor_moved = 1;
+        prev_clue();
+        needs_redraw = 1;
     }
     if (input_just_pressed(J_DOWN)) {
-        move_cursor(0, 1);
-        cursor_moved = 1;
+        next_clue();
+        needs_redraw = 1;
     }
+
+    // LEFT/RIGHT - move within current word
     if (input_just_pressed(J_LEFT)) {
-        move_cursor(-1, 0);
-        cursor_moved = 1;
+        move_in_word(-1);
+        needs_redraw = 1;
     }
     if (input_just_pressed(J_RIGHT)) {
-        move_cursor(1, 0);
-        cursor_moved = 1;
+        move_in_word(1);
+        needs_redraw = 1;
     }
 
     // A button - enter letter input mode
@@ -197,17 +200,17 @@ static void handle_playing_state(void) {
         }
     }
 
-    // B button - delete letter / go back
+    // B button - delete letter and move back
     if (input_just_pressed(J_B)) {
         delete_letter();
-        graphics_draw_grid(&current_puzzle, &view_offset);
-        graphics_draw_cursor(&cursor, &view_offset);
+        move_in_word(-1);
+        needs_redraw = 1;
     }
 
-    // SELECT - toggle direction
+    // SELECT - toggle direction (across/down)
     if (input_just_pressed(J_SELECT)) {
         toggle_direction();
-        cursor_moved = 1;  // Redraw clue
+        needs_redraw = 1;
     }
 
     // START - pause menu
@@ -216,8 +219,8 @@ static void handle_playing_state(void) {
         // TODO: Draw pause menu
     }
 
-    // Update display if cursor moved
-    if (cursor_moved || old_x != cursor.x || old_y != cursor.y) {
+    // Update display if anything changed
+    if (needs_redraw || old_x != cursor.x || old_y != cursor.y) {
         graphics_update_view(&view_offset, &cursor);
         graphics_draw_grid(&current_puzzle, &view_offset);
         graphics_draw_cursor(&cursor, &view_offset);
@@ -284,7 +287,7 @@ static void handle_letter_input_state(void) {
     if (input_just_pressed(J_A)) {
         enter_letter('A' + letter_input_selection);
         graphics_hide_letter_input();
-        advance_cursor();
+        move_in_word(1);  // Advance to next cell in word
         current_state = STATE_PLAYING;
 
         graphics_draw_grid(&current_puzzle, &view_offset);
@@ -323,42 +326,7 @@ static void handle_complete_state(void) {
 
 // Helper functions
 
-static void move_cursor(int8_t dx, int8_t dy) {
-    int8_t new_x = cursor.x + dx;
-    int8_t new_y = cursor.y + dy;
-
-    // Bounds checking
-    if (new_x < 0 || new_x >= GRID_WIDTH) return;
-    if (new_y < 0 || new_y >= GRID_HEIGHT) return;
-
-    // Skip black cells
-    while (current_puzzle.grid[new_y][new_x].solution == CELL_BLACK) {
-        new_x += dx;
-        new_y += dy;
-        if (new_x < 0 || new_x >= GRID_WIDTH) return;
-        if (new_y < 0 || new_y >= GRID_HEIGHT) return;
-    }
-
-    cursor.x = new_x;
-    cursor.y = new_y;
-}
-
-static void toggle_direction(void) {
-    cursor.dir = (cursor.dir == DIR_ACROSS) ? DIR_DOWN : DIR_ACROSS;
-}
-
-static void advance_cursor(void) {
-    if (cursor.dir == DIR_ACROSS) {
-        move_cursor(1, 0);
-    } else {
-        move_cursor(0, 1);
-    }
-}
-
 static const Clue* get_current_clue(void) {
-    Cell* cell = &current_puzzle.grid[cursor.y][cursor.x];
-
-    // Find the clue for the current cell
     const Clue* clues = (cursor.dir == DIR_ACROSS) ?
                         current_puzzle.across_clues :
                         current_puzzle.down_clues;
@@ -366,30 +334,87 @@ static const Clue* get_current_clue(void) {
                     current_puzzle.across_count :
                     current_puzzle.down_count;
 
-    // Walk backwards to find start of word
-    int8_t search_x = cursor.x;
-    int8_t search_y = cursor.y;
-
-    if (cursor.dir == DIR_ACROSS) {
-        while (search_x > 0 &&
-               current_puzzle.grid[search_y][search_x - 1].solution != CELL_BLACK) {
-            search_x--;
-        }
-    } else {
-        while (search_y > 0 &&
-               current_puzzle.grid[search_y - 1][search_x].solution != CELL_BLACK) {
-            search_y--;
-        }
+    if (current_clue_index < count) {
+        return &clues[current_clue_index];
     }
-
-    // Find matching clue
-    for (uint8_t i = 0; i < count; i++) {
-        if (clues[i].start_x == search_x && clues[i].start_y == search_y) {
-            return &clues[i];
-        }
-    }
-
     return NULL;
+}
+
+static void update_cursor_from_clue(void) {
+    const Clue* clue = get_current_clue();
+    if (clue == NULL) return;
+
+    // Clamp word_offset to valid range
+    if (word_offset >= clue->length) {
+        word_offset = clue->length - 1;
+    }
+
+    // Calculate cursor position from clue start + offset
+    if (cursor.dir == DIR_ACROSS) {
+        cursor.x = clue->start_x + word_offset;
+        cursor.y = clue->start_y;
+    } else {
+        cursor.x = clue->start_x;
+        cursor.y = clue->start_y + word_offset;
+    }
+}
+
+static void next_clue(void) {
+    uint8_t count = (cursor.dir == DIR_ACROSS) ?
+                    current_puzzle.across_count :
+                    current_puzzle.down_count;
+
+    if (count == 0) return;
+
+    current_clue_index++;
+    if (current_clue_index >= count) {
+        current_clue_index = 0;  // Wrap to first clue
+    }
+    word_offset = 0;  // Start at beginning of new word
+    update_cursor_from_clue();
+}
+
+static void prev_clue(void) {
+    uint8_t count = (cursor.dir == DIR_ACROSS) ?
+                    current_puzzle.across_count :
+                    current_puzzle.down_count;
+
+    if (count == 0) return;
+
+    if (current_clue_index == 0) {
+        current_clue_index = count - 1;  // Wrap to last clue
+    } else {
+        current_clue_index--;
+    }
+    word_offset = 0;  // Start at beginning of new word
+    update_cursor_from_clue();
+}
+
+static void move_in_word(int8_t delta) {
+    const Clue* clue = get_current_clue();
+    if (clue == NULL) return;
+
+    int8_t new_offset = (int8_t)word_offset + delta;
+
+    // Clamp to word bounds (don't wrap)
+    if (new_offset < 0) {
+        new_offset = 0;
+    } else if (new_offset >= clue->length) {
+        new_offset = clue->length - 1;
+    }
+
+    word_offset = new_offset;
+    update_cursor_from_clue();
+}
+
+static void toggle_direction(void) {
+    // Switch direction
+    cursor.dir = (cursor.dir == DIR_ACROSS) ? DIR_DOWN : DIR_ACROSS;
+
+    // Reset to first clue of new direction
+    current_clue_index = 0;
+    word_offset = 0;
+    update_cursor_from_clue();
 }
 
 static void enter_letter(uint8_t letter) {

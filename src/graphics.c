@@ -82,9 +82,6 @@ void graphics_draw_grid(const Puzzle* puzzle, const ViewOffset* offset) {
                     tile = TILE_BLACK;
                 } else if (cell->player_input >= 'A' && cell->player_input <= 'Z') {
                     tile = TILE_LETTER_A + (cell->player_input - 'A');
-                } else if (cell->clue_num >= 1 && cell->clue_num <= 15) {
-                    // Empty cell with clue number
-                    tile = TILE_CELL_NUM_1 + (cell->clue_num - 1);
                 } else {
                     tile = TILE_EMPTY;
                 }
