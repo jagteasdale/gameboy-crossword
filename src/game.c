@@ -364,29 +364,28 @@ static void next_clue(void) {
                     current_puzzle.across_count :
                     current_puzzle.down_count;
 
-    if (count == 0) return;
-
     current_clue_index++;
     if (current_clue_index >= count) {
-        current_clue_index = 0;  // Wrap to first clue
+        // Switch direction and go to first clue
+        cursor.dir = (cursor.dir == DIR_ACROSS) ? DIR_DOWN : DIR_ACROSS;
+        current_clue_index = 0;
     }
-    word_offset = 0;  // Start at beginning of new word
+    word_offset = 0;
     update_cursor_from_clue();
 }
 
 static void prev_clue(void) {
-    uint8_t count = (cursor.dir == DIR_ACROSS) ?
-                    current_puzzle.across_count :
-                    current_puzzle.down_count;
-
-    if (count == 0) return;
-
     if (current_clue_index == 0) {
-        current_clue_index = count - 1;  // Wrap to last clue
+        // Switch direction and go to last clue
+        cursor.dir = (cursor.dir == DIR_ACROSS) ? DIR_DOWN : DIR_ACROSS;
+        uint8_t count = (cursor.dir == DIR_ACROSS) ?
+                        current_puzzle.across_count :
+                        current_puzzle.down_count;
+        current_clue_index = (count > 0) ? count - 1 : 0;
     } else {
         current_clue_index--;
     }
-    word_offset = 0;  // Start at beginning of new word
+    word_offset = 0;
     update_cursor_from_clue();
 }
 
