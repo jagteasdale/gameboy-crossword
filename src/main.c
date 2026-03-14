@@ -12,11 +12,8 @@ void main(void) {
 
     // Initialize subsystems
     input_init();
-    graphics_init();
+    graphics_init();  // This enables display after VRAM setup
     game_init();
-
-    // Enable display
-    DISPLAY_ON;
 
     // Enable interrupts
     enable_interrupts();
