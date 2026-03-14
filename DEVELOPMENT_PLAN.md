@@ -144,9 +144,10 @@ This document outlines the implementation plan for a 15x15 cryptic crossword gam
 - [ ] Save best times
 
 ### 5.6 Web Playability
-- [ ] GitHub Pages site with embedded emulator (e.g., EmulatorJS, JSBoy)
-- [ ] Auto-deploy ROM on push (GitHub Actions)
-- [ ] Play directly from repo without downloading
+- [x] GitHub Pages site with embedded emulator (EmulatorJS/Gambatte)
+- [x] Auto-deploy ROM on push (GitHub Actions)
+- [x] Play directly from repo without downloading
+- Note: Safari desktop has rendering issues; Chrome/Firefox/mobile work fine
 
 ---
 
