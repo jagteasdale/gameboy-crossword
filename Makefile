@@ -9,7 +9,8 @@ PNG2ASSET = $(GBDK_HOME)/bin/png2asset
 
 # Compiler flags
 CFLAGS = -Wa-l -Wl-m -Wl-j -Iinclude -Isrc
-LDFLAGS =
+# MBC5+RAM+BATTERY (0x1B) with 8KB SRAM (1 bank)
+LDFLAGS = -Wm-yt0x1B -Wm-ya1
 
 # Project settings
 PROJECT_NAME = crossword

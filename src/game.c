@@ -5,6 +5,7 @@
 #include "input.h"
 #include "graphics.h"
 #include "puzzles.h"
+#include "save.h"
 
 // Game state
 static GameState current_state;
@@ -15,6 +16,7 @@ static ViewOffset view_offset;
 // Clue-first navigation state
 static uint8_t current_clue_index;  // Index into across_clues or down_clues
 static uint8_t word_offset;         // Position within current word (0 = first letter)
+static uint8_t current_puzzle_index; // Which puzzle is currently loaded
 
 // Menu state
 static uint8_t menu_selection;
@@ -40,6 +42,7 @@ static void toggle_direction(void);
 static const Clue* get_current_clue(void);
 static void enter_letter(uint8_t letter);
 static void delete_letter(void);
+static void autosave(void);
 
 void game_init(void) {
     current_state = STATE_TITLE;
@@ -83,12 +86,23 @@ void game_update(void) {
 }
 
 void game_load_puzzle(uint8_t puzzle_index) {
+    current_puzzle_index = puzzle_index;
     puzzles_init_player_grid(&current_puzzle, puzzle_index);
 
-    // Start at first across clue
-    cursor.dir = DIR_ACROSS;
-    current_clue_index = 0;
-    word_offset = 0;
+    // Try to load saved progress
+    uint8_t saved_clue, saved_offset, saved_dir;
+    if (save_load(puzzle_index, &current_puzzle, &saved_clue, &saved_offset, &saved_dir)) {
+        // Restore saved position
+        current_clue_index = saved_clue;
+        word_offset = saved_offset;
+        cursor.dir = saved_dir;
+    } else {
+        // No save - start at first across clue
+        cursor.dir = DIR_ACROSS;
+        current_clue_index = 0;
+        word_offset = 0;
+    }
+
     view_offset.x = 0;
     view_offset.y = 0;
 
@@ -204,6 +218,7 @@ static void handle_playing_state(void) {
     if (input_just_pressed(J_B)) {
         delete_letter();
         move_in_word(-1);
+        autosave();
         needs_redraw = 1;
     }
 
@@ -290,11 +305,15 @@ static void handle_letter_input_state(void) {
         move_in_word(1);  // Advance to next cell in word
         current_state = STATE_PLAYING;
 
+        // Auto-save progress
+        autosave();
+
         graphics_draw_grid(&current_puzzle, &view_offset);
         graphics_draw_cursor(&cursor, &view_offset);
 
         // Check for completion
         if (game_check_complete()) {
+            save_mark_complete(current_puzzle_index);
             current_state = STATE_COMPLETE;
             graphics_draw_complete();
         }
@@ -422,4 +441,9 @@ static void enter_letter(uint8_t letter) {
 
 static void delete_letter(void) {
     current_puzzle.grid[cursor.y][cursor.x].player_input = CELL_EMPTY;
+}
+
+static void autosave(void) {
+    save_puzzle(current_puzzle_index, &current_puzzle,
+                current_clue_index, word_offset, cursor.dir);
 }
