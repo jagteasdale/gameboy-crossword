@@ -128,10 +128,10 @@ This document outlines the implementation plan for a 15x15 cryptic crossword gam
 - [ ] Settings menu
 
 ### 5.3 Save System (SRAM)
-- [ ] Save current puzzle progress
-- [ ] Load saved game
-- [ ] Track completed puzzles
-- [ ] Battery-backed SRAM support
+- [x] Save current puzzle progress
+- [x] Load saved game
+- [x] Track completed puzzles
+- [x] Battery-backed SRAM support (MBC5+RAM+BATTERY)
 
 ### 5.4 Audio (Optional)
 - [ ] Sound effects for input
