@@ -284,6 +284,35 @@ void graphics_draw_complete(void) {
     move_sprite(0, 0, 0);
 }
 
+void graphics_draw_pause_menu(void) {
+    // Clear screen
+    for (uint8_t y = 0; y < SCREEN_TILES_Y; y++) {
+        for (uint8_t x = 0; x < SCREEN_TILES_X; x++) {
+            screen_buffer[y][x] = TILE_SPACE;
+        }
+    }
+
+    // Draw "PAUSED" (centered at row 7)
+    const char* paused = "PAUSED";
+    uint8_t paused_x = (SCREEN_TILES_X - 6) / 2;
+    for (uint8_t i = 0; paused[i] != '\0'; i++) {
+        screen_buffer[7][paused_x + i] = char_to_tile(paused[i]);
+    }
+
+    // Draw "PRESS START" (centered at row 11)
+    const char* prompt = "PRESS START";
+    uint8_t prompt_x = (SCREEN_TILES_X - 11) / 2;
+    for (uint8_t i = 0; prompt[i] != '\0'; i++) {
+        screen_buffer[11][prompt_x + i] = char_to_tile(prompt[i]);
+    }
+
+    // Copy to VRAM
+    set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
+
+    // Hide cursor sprite
+    move_sprite(0, 0, 0);
+}
+
 void graphics_draw_cell(uint8_t screen_x, uint8_t screen_y, const Cell* cell, uint8_t is_cursor) {
     uint8_t tile;
 

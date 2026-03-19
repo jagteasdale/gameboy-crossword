@@ -47,6 +47,9 @@ void graphics_draw_menu(uint8_t selected_index, uint8_t puzzle_count);
 // Draw completion screen
 void graphics_draw_complete(void);
 
+// Draw pause menu overlay
+void graphics_draw_pause_menu(void);
+
 // Draw a single cell
 void graphics_draw_cell(uint8_t screen_x, uint8_t screen_y, const Cell* cell, uint8_t is_cursor);
 

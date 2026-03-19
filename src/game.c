@@ -231,7 +231,7 @@ static void handle_playing_state(void) {
     // START - pause menu
     if (input_just_pressed(J_START)) {
         current_state = STATE_PAUSED;
-        // TODO: Draw pause menu
+        graphics_draw_pause_menu();
     }
 
     // Update display if anything changed
