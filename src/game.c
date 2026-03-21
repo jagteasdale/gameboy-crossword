@@ -20,6 +20,7 @@ static uint8_t current_puzzle_index; // Which puzzle is currently loaded
 
 // Menu state
 static uint8_t menu_selection;
+static uint8_t pause_menu_selection;
 
 // Letter input state
 static uint8_t letter_input_selection;  // 0-25 for A-Z
@@ -231,7 +232,8 @@ static void handle_playing_state(void) {
     // START - pause menu
     if (input_just_pressed(J_START)) {
         current_state = STATE_PAUSED;
-        graphics_draw_pause_menu();
+        pause_menu_selection = PAUSE_OPTION_RESUME;
+        graphics_draw_pause_menu(pause_menu_selection);
     }
 
     // Update display if anything changed
@@ -329,10 +331,47 @@ static void handle_letter_input_state(void) {
 }
 
 static void handle_paused_state(void) {
-    if (input_just_pressed(J_START)) {
+    // Navigate menu
+    if (input_just_pressed(J_UP)) {
+        if (pause_menu_selection > 0) {
+            pause_menu_selection--;
+            graphics_draw_pause_menu(pause_menu_selection);
+        }
+    }
+    if (input_just_pressed(J_DOWN)) {
+        if (pause_menu_selection < PAUSE_OPTION_COUNT - 1) {
+            pause_menu_selection++;
+            graphics_draw_pause_menu(pause_menu_selection);
+        }
+    }
+
+    // Select option
+    if (input_just_pressed(J_A) || input_just_pressed(J_START)) {
+        if (pause_menu_selection == PAUSE_OPTION_RESUME) {
+            current_state = STATE_PLAYING;
+            graphics_draw_grid(&current_puzzle, &view_offset);
+            graphics_draw_cursor(&cursor, &view_offset);
+            const Clue* clue = get_current_clue();
+            if (clue) {
+                graphics_draw_clue(clue, cursor.dir);
+            }
+        } else if (pause_menu_selection == PAUSE_OPTION_QUIT) {
+            // Save progress and return to menu
+            autosave();
+            current_state = STATE_MENU;
+            graphics_draw_menu(menu_selection, PUZZLE_COUNT);
+        }
+    }
+
+    // B also resumes
+    if (input_just_pressed(J_B)) {
         current_state = STATE_PLAYING;
         graphics_draw_grid(&current_puzzle, &view_offset);
         graphics_draw_cursor(&cursor, &view_offset);
+        const Clue* clue = get_current_clue();
+        if (clue) {
+            graphics_draw_clue(clue, cursor.dir);
+        }
     }
 }
 

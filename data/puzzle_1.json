@@ -1,0 +1,41 @@
+{
+    "title": "March Cryptic",
+    "author": "JG",
+    "grid": [
+        "ARTIFICIAL#CHAT",
+        "S#A#I#L#N###A#I",
+        "IMPORTANT#UNLIT",
+        "M#####U#I#N#L#H",
+        "OAP#WIDTH#PAUSE",
+        "V#R#H#E#E#O#C#S",
+        "#MODE##GRAPHIC#",
+        "##N#R#B#O#U#N##",
+        "#GAMEBOY##LEAN#",
+        "P#T#F#O#E#A#T#R",
+        "AMARO#KHMER#ERA",
+        "S#L#R#S#E#####N",
+        "SPICE#HOTSTREAK",
+        "E#S###O#I#I#S#L",
+        "DATE#APOCALYPSE"
+    ],
+    "across": [
+        {
+            "number": 1,
+            "clue": "Poorly made dial turned out to be not digital (6)",
+            "answer": "RADIAL"
+        }
+    ],
+    "down": [
+        {
+            "number": 1,
+            "clue": "Emit waves from communication device (5)",
+            "answer": "RADIATE"
+        },
+        {
+            "number": 2,
+            "clue": "Used in court, it rings when you dial (5)",
+            "answer": "TRIAL"
+        }
+    ],
+    "notes": "This is a complete grid, but clues are still to fill in."
+}

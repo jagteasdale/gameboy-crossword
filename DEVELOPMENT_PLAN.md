@@ -75,7 +75,7 @@ This document outlines the implementation plan for a 15x15 cryptic crossword gam
 - [x] Letter selection with D-pad
 - [x] Confirm/cancel letter
 - [x] Auto-advance after entry
-- [ ] Delete/backspace functionality
+- [x] Delete/backspace functionality
 
 ### 3.3 Clue System
 - [x] Find clue for current cell
@@ -123,8 +123,9 @@ This document outlines the implementation plan for a 15x15 cryptic crossword gam
 - [ ] Copyright/credits
 
 ### 5.2 Menu System
-- [ ] Puzzle selection list
+- [x] Puzzle selection list
 - [ ] Show puzzle progress (started/completed)
+- [x] Pause menu with resume/back options
 - [ ] Settings menu
 
 ### 5.3 Save System (SRAM)

@@ -284,7 +284,7 @@ void graphics_draw_complete(void) {
     move_sprite(0, 0, 0);
 }
 
-void graphics_draw_pause_menu(void) {
+void graphics_draw_pause_menu(uint8_t selected_option) {
     // Clear screen
     for (uint8_t y = 0; y < SCREEN_TILES_Y; y++) {
         for (uint8_t x = 0; x < SCREEN_TILES_X; x++) {
@@ -292,18 +292,31 @@ void graphics_draw_pause_menu(void) {
         }
     }
 
-    // Draw "PAUSED" (centered at row 7)
+    // Draw "PAUSED" header (centered at row 4)
     const char* paused = "PAUSED";
     uint8_t paused_x = (SCREEN_TILES_X - 6) / 2;
     for (uint8_t i = 0; paused[i] != '\0'; i++) {
-        screen_buffer[7][paused_x + i] = char_to_tile(paused[i]);
+        screen_buffer[4][paused_x + i] = char_to_tile(paused[i]);
     }
 
-    // Draw "PRESS START" (centered at row 11)
-    const char* prompt = "PRESS START";
-    uint8_t prompt_x = (SCREEN_TILES_X - 11) / 2;
-    for (uint8_t i = 0; prompt[i] != '\0'; i++) {
-        screen_buffer[11][prompt_x + i] = char_to_tile(prompt[i]);
+    // Menu options starting at row 8
+    const char* options[] = { "RESUME", "BACK" };
+    uint8_t option_rows[] = { 8, 10 };
+
+    for (uint8_t i = 0; i < PAUSE_OPTION_COUNT; i++) {
+        uint8_t row = option_rows[i];
+        uint8_t text_x = 5;
+
+        // Draw selection arrow
+        if (i == selected_option) {
+            screen_buffer[row][3] = TILE_ARROW_RIGHT;
+        }
+
+        // Draw option text
+        const char* text = options[i];
+        for (uint8_t j = 0; text[j] != '\0'; j++) {
+            screen_buffer[row][text_x + j] = char_to_tile(text[j]);
+        }
     }
 
     // Copy to VRAM
