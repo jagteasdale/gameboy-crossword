@@ -24,23 +24,23 @@ static const Clue sample_down_clues[] = {
 };
 
 // Sample 15x15 grid template
-// B = black cell, . = empty white cell
+// # = black cell, . = empty white cell, A-Z = solution letters
 // This is a simplified demo grid - real crosswords have symmetric patterns
 static const char sample_grid_template[GRID_HEIGHT][GRID_WIDTH + 1] = {
-    "RADIALBBBBWORDS",
-    ".B.B.BBBBB.B.B.",
-    "BETABBBBBBANTBB",
-    ".B.BBBBBBB.B.BB",
-    "ALOHABBBBBBPENB",
-    "BBBBBBBBBBBBBBB",
+    "RADIAL####WORDS",
+    ".#.#.#####.#.#.",
+    "BETA######ANT##",
+    ".#.#######.#.##",
+    "ALOHA######PEN#",
+    "###############",
     "...............",
-    "B.B.B.B.B.B.B.B",
+    "#.#.#.#.#.#.#.#",
     "...............",
-    "BBBBBBBBBBBBBBB",
+    "###############",
     "...............",
-    "B.B.B.B.B.B.B.B",
+    "#.#.#.#.#.#.#.#",
     "...............",
-    "BBBBBBBBBBBBBBB",
+    "###############",
     "...............",
 };
 // Puzzle 0: March Cryptic
@@ -52,7 +52,7 @@ static const char puzzle0_clue_6a[] = "Discuss a hundred-odd hearts (4)";
 static const char puzzle0_clue_9a[] = "Prominent trade worker (9)";
 static const char puzzle0_clue_10a[] = "Gloomy nut freaks out on lithium (5)";
 static const char puzzle0_clue_11a[] = "Older person lasts to samba step (3)";
-static const char puzzle0_clue_13a[] = "How I’d thought to contain scope (5)";
+static const char puzzle0_clue_13a[] = "How I'd thought to contain scope (5)";
 static const char puzzle0_clue_14a[] = "Stop employ after assistant (5)";
 static const char puzzle0_clue_15a[] = "Average German follows standard way of working (4)";
 static const char puzzle0_clue_16a[] = "Grand artist read out work written by fan, a type of novel (7)";
@@ -70,14 +70,14 @@ static const char puzzle0_clue_36a[] = "Saffron I parcel out, special price not 
 static const char puzzle0_clue_1d[] = "Writer of fantastical movies gave note for lead actor (6)";
 static const char puzzle0_clue_2d[] = "Pat back and forth? (3)";
 static const char puzzle0_clue_3d[] = "Odds of flier making tree (3)";
-static const char puzzle0_clue_4d[] = "Monet about to exclaim “God!” (6)";
+static const char puzzle0_clue_4d[] = "Monet about to exclaim \"God!\" (6)";
 static const char puzzle0_clue_5d[] = "Blows air on the Batman (8)";
 static const char puzzle0_clue_7d[] = "See things are messed up, I launch late (11)";
-static const char puzzle0_clue_8d[] = "Donations to church – model it health economics style, to begin with (6)";
+static const char puzzle0_clue_8d[] = "Donations to church - model it health economics style, to begin with (6)";
 static const char puzzle0_clue_10d[] = "Disliked posh juice pulp on a second try (9)";
 static const char puzzle0_clue_12d[] = "In favour of resigned type loudly going after new advocate for children (11)";
 static const char puzzle0_clue_13d[] = "Loud clothes, for what reason? (9)";
-static const char puzzle0_clue_17d[] = "Daunt logs what bunnies d​​o (8)";
+static const char puzzle0_clue_17d[] = "Daunt logs what bunnies do (8)";
 static const char puzzle0_clue_20d[] = "Back when speaking meant no action taken (6)";
 static const char puzzle0_clue_21d[] = "Makes you sick? Even celiac takes force (6)";
 static const char puzzle0_clue_22d[] = "Irritate leg joint post-run (6)";
@@ -95,7 +95,7 @@ static const Clue puzzle0_across_clues[] = {
     { 14, 10, 4, 5, puzzle0_clue_14a },
     { 15, 1, 6, 4, puzzle0_clue_15a },
     { 16, 7, 6, 7, puzzle0_clue_16a },
-    { 18, 6, 8, 2, puzzle0_clue_18a },
+    { 18, 1, 8, 7, puzzle0_clue_18a },
     { 19, 10, 8, 4, puzzle0_clue_19a },
     { 23, 0, 10, 5, puzzle0_clue_23a },
     { 24, 6, 10, 5, puzzle0_clue_24a },
@@ -126,23 +126,23 @@ static const Clue puzzle0_down_clues[] = {
     { 29, 12, 12, 3, puzzle0_clue_29d },
 };
 
-// Grid template
+// Grid template: # = black cell, A-Z = solution letters
 static const char puzzle0_grid_template[GRID_HEIGHT][GRID_WIDTH + 1] = {
-    "ARTIFICIALBCHAT",
-    "SBABIBLBNBBBABI",
-    "IMPORTANTBUNLIT",
-    "MBBBBBUBIBNBLBH",
-    "OAPBWIDTHBPAUSE",
-    "VBRBHBEBEBOBCBS",
-    "BMODEBBGRAPHICB",
-    "BBNBRBBBOBUBNBB",
-    "BGAMEBOYBBLEANB",
-    "PBTBFBOBEBABTBR",
-    "AMAROBKHMERBERA",
-    "SBLBRBSBEBBBBBN",
-    "SPICEBHOTSTREAK",
-    "EBSBBBOBIBIBSBL",
-    "DATEBAPOCALYPSE",
+    "ARTIFICIAL#CHAT",
+    "S#A#I#L#N###A#I",
+    "IMPORTANT#UNLIT",
+    "M#####U#I#N#L#H",
+    "OAP#WIDTH#PAUSE",
+    "V#R#H#E#E#O#C#S",
+    "#MODE##GRAPHIC#",
+    "##N#R#B#O#U#N##",
+    "#GAMEBOY##LEAN#",
+    "P#T#F#O#E#A#T#R",
+    "AMARO#KHMER#ERA",
+    "S#L#R#S#E#####N",
+    "SPICE#HOTSTREAK",
+    "E#S###O#I#I#S#L",
+    "DATE#APOCALYPSE",
 };
 
 // Puzzle 0 definition
@@ -166,7 +166,7 @@ static void init_grid_from_template(Cell grid[GRID_HEIGHT][GRID_WIDTH],
             cell->player_input = CELL_EMPTY;
             cell->flags = 0;
 
-            if (c == 'B' || c == '#') {
+            if (c == '#') {
                 cell->solution = CELL_BLACK;
                 cell->clue_num = 0;
             } else if (c == '.') {
@@ -178,9 +178,9 @@ static void init_grid_from_template(Cell grid[GRID_HEIGHT][GRID_WIDTH],
 
                 // Check if this is start of a word (for clue numbering)
                 uint8_t is_across_start = (x == 0 || grid[y][x-1].solution == CELL_BLACK) &&
-                                          (x + 1 < GRID_WIDTH && template[y][x+1] != 'B');
+                                          (x + 1 < GRID_WIDTH && template[y][x+1] != '#');
                 uint8_t is_down_start = (y == 0 || grid[y-1][x].solution == CELL_BLACK) &&
-                                        (y + 1 < GRID_HEIGHT && template[y+1][x] != 'B');
+                                        (y + 1 < GRID_HEIGHT && template[y+1][x] != '#');
 
                 if (is_across_start) cell->flags |= FLAG_ACROSS_START;
                 if (is_down_start) cell->flags |= FLAG_DOWN_START;

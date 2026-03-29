@@ -110,6 +110,9 @@ void graphics_draw_cursor(const Cursor* cursor, const ViewOffset* offset) {
     uint8_t screen_x = cursor->x - offset->x;
     uint8_t screen_y = cursor->y - offset->y;
 
+    // Ensure sprite tile is set
+    set_sprite_tile(0, TILE_CURSOR);
+
     // Only draw if on screen
     if (screen_x < GRID_VIEW_WIDTH && screen_y < GRID_VIEW_HEIGHT) {
         // Sprite positions are offset by 8,16 from tile positions
@@ -326,7 +329,7 @@ void graphics_draw_pause_menu(uint8_t selected_option) {
     move_sprite(0, 0, 0);
 }
 
-void graphics_draw_full_clue(const Clue* clue, Direction dir) {
+void graphics_draw_full_clue(const Clue* clue, Direction dir, const Puzzle* puzzle, uint8_t word_pos) {
     // Clear screen
     for (uint8_t y = 0; y < SCREEN_TILES_Y; y++) {
         for (uint8_t x = 0; x < SCREEN_TILES_X; x++) {
@@ -353,29 +356,101 @@ void graphics_draw_full_clue(const Clue* clue, Direction dir) {
         screen_buffer[1][x_pos++] = char_to_tile(dir_text[i]);
     }
 
-    // Draw clue text with word wrap starting at row 4
+    // Draw clue text with word wrap starting at row 3
+    // Don't split words across lines
     const char* text = clue->text;
-    uint8_t row = 4;
+    uint8_t row = 3;
     x_pos = 1;
+    uint8_t max_x = SCREEN_TILES_X - 1;
 
-    while (*text != '\0' && row < SCREEN_TILES_Y - 2) {
-        if (x_pos >= SCREEN_TILES_X - 1) {
-            // Wrap to next line
-            row++;
-            x_pos = 1;
-            if (row >= SCREEN_TILES_Y - 2) break;
+    while (*text != '\0' && row < SCREEN_TILES_Y - 3) {
+        // Skip leading spaces at start of line
+        if (x_pos == 1) {
+            while (*text == ' ') text++;
+            if (*text == '\0') break;
         }
 
-        screen_buffer[row][x_pos] = char_to_tile(*text);
-        x_pos++;
-        text++;
+        // Find word length
+        uint8_t word_len = 0;
+        while (text[word_len] != '\0' && text[word_len] != ' ') {
+            word_len++;
+        }
+
+        // If word doesn't fit on current line and we're not at start, wrap
+        if (x_pos > 1 && x_pos + word_len > max_x) {
+            row++;
+            x_pos = 1;
+            if (row >= SCREEN_TILES_Y - 3) break;
+        }
+
+        // Draw the word
+        for (uint8_t i = 0; i < word_len && x_pos < max_x; i++) {
+            screen_buffer[row][x_pos++] = char_to_tile(text[i]);
+        }
+        text += word_len;
+
+        // Handle space after word
+        if (*text == ' ') {
+            if (x_pos < max_x) {
+                screen_buffer[row][x_pos++] = TILE_SPACE;
+            }
+            text++;
+        }
+    }
+
+    // Draw answer cells at bottom row (row 16)
+    // Center the cells: start at (SCREEN_TILES_X - length) / 2
+    uint8_t answer_row = SCREEN_TILES_Y - 2;
+    uint8_t start_x = (SCREEN_TILES_X - clue->length) / 2;
+
+    for (uint8_t i = 0; i < clue->length; i++) {
+        uint8_t cell_x = clue->start_x + (dir == DIR_ACROSS ? i : 0);
+        uint8_t cell_y = clue->start_y + (dir == DIR_DOWN ? i : 0);
+        const Cell* cell = &puzzle->grid[cell_y][cell_x];
+
+        uint8_t tile;
+        if (cell->player_input >= 'A' && cell->player_input <= 'Z') {
+            tile = TILE_LETTER_A + (cell->player_input - 'A');
+        } else {
+            tile = TILE_EMPTY;
+        }
+        screen_buffer[answer_row][start_x + i] = tile;
     }
 
     // Copy to VRAM
     set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
 
-    // Hide cursor sprite
-    move_sprite(0, 0, 0);
+    // Show cursor sprite on current cell
+    uint8_t cursor_screen_x = (start_x + word_pos) * 8 + 8;
+    uint8_t cursor_screen_y = answer_row * 8 + 16;
+    move_sprite(0, cursor_screen_x, cursor_screen_y);
+}
+
+void graphics_update_clue_answer(const Clue* clue, Direction dir, const Puzzle* puzzle, uint8_t word_pos) {
+    if (clue == NULL) return;
+
+    uint8_t answer_row = SCREEN_TILES_Y - 2;
+    uint8_t start_x = (SCREEN_TILES_X - clue->length) / 2;
+
+    // Update just the answer row
+    for (uint8_t i = 0; i < clue->length; i++) {
+        uint8_t cell_x = clue->start_x + (dir == DIR_ACROSS ? i : 0);
+        uint8_t cell_y = clue->start_y + (dir == DIR_DOWN ? i : 0);
+        const Cell* cell = &puzzle->grid[cell_y][cell_x];
+
+        uint8_t tile;
+        if (cell->player_input >= 'A' && cell->player_input <= 'Z') {
+            tile = TILE_LETTER_A + (cell->player_input - 'A');
+        } else {
+            tile = TILE_EMPTY;
+        }
+        set_bkg_tile_xy(start_x + i, answer_row, tile);
+    }
+
+    // Update cursor position
+    uint8_t cursor_screen_x = (start_x + word_pos) * 8 + 8;
+    uint8_t cursor_screen_y = answer_row * 8 + 16;
+    move_sprite(0, cursor_screen_x, cursor_screen_y);
 }
 
 void graphics_draw_cell(uint8_t screen_x, uint8_t screen_y, const Cell* cell, uint8_t is_cursor) {

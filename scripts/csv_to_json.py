@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
-"""Convert crossword clues CSV to JSON format."""
+"""Convert crossword clues CSV to JSON format.
+
+Input CSV format:
+  Column 1: Direction ("Across" or "Down")
+  Column 2: Clue number
+  Column 3: Answer (uppercase)
+  Column 4: Clue text
+
+Output: JSON with "across" and "down" arrays, sorted by clue number.
+
+Note: Grid templates must use '#' for black squares (not 'B'),
+since 'B' is a valid letter in answers.
+"""
 
 import csv
 import json

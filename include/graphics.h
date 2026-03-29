@@ -70,8 +70,11 @@ void graphics_show_letter_input(uint8_t selected_letter);
 // Hide the letter input overlay
 void graphics_hide_letter_input(void);
 
-// Draw full clue popup (fullscreen overlay)
-void graphics_draw_full_clue(const Clue* clue, Direction dir);
+// Draw full clue popup with answer cells at bottom
+void graphics_draw_full_clue(const Clue* clue, Direction dir, const Puzzle* puzzle, uint8_t word_pos);
+
+// Update just the answer row in clue view (after letter entry)
+void graphics_update_clue_answer(const Clue* clue, Direction dir, const Puzzle* puzzle, uint8_t word_pos);
 
 // Helper to convert ASCII to tile index
 uint8_t char_to_tile(char c);

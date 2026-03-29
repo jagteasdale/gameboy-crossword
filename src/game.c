@@ -18,6 +18,8 @@ static uint8_t current_clue_index;  // Index into across_clues or down_clues
 static uint8_t word_offset;         // Position within current word (0 = first letter)
 static uint8_t current_puzzle_index; // Which puzzle is currently loaded
 
+static uint8_t clue_view_letter_input;
+
 // Menu state
 static uint8_t menu_selection;
 static uint8_t pause_menu_selection;
@@ -209,6 +211,7 @@ static void handle_playing_state(void) {
             } else {
                 letter_input_selection = 0;
             }
+            clue_view_letter_input = 0;
             current_state = STATE_LETTER_INPUT;
             graphics_show_letter_input(letter_input_selection);
         }
@@ -227,7 +230,7 @@ static void handle_playing_state(void) {
         const Clue* clue = get_current_clue();
         if (clue) {
             current_state = STATE_CLUE_VIEW;
-            graphics_draw_full_clue(clue, cursor.dir);
+            graphics_draw_full_clue(clue, cursor.dir, &current_puzzle, word_offset);
         }
     }
 
@@ -251,14 +254,58 @@ static void handle_playing_state(void) {
     }
 }
 
+// Track if we entered letter input from clue view
+
 static void handle_clue_view_state(void) {
-    // Full clue view - press any button to return
-    if (input_just_pressed(J_A) || input_just_pressed(J_B) ||
-        input_just_pressed(J_SELECT) || input_just_pressed(J_START)) {
+    const Clue* clue = get_current_clue();
+
+    // LEFT/RIGHT - move within word
+    if (input_just_pressed(J_LEFT)) {
+        if (word_offset > 0) {
+            word_offset--;
+            update_cursor_from_clue();
+            graphics_update_clue_answer(clue, cursor.dir, &current_puzzle, word_offset);
+        }
+    }
+    if (input_just_pressed(J_RIGHT)) {
+        if (clue && word_offset < clue->length - 1) {
+            word_offset++;
+            update_cursor_from_clue();
+            graphics_update_clue_answer(clue, cursor.dir, &current_puzzle, word_offset);
+        }
+    }
+
+    // A - enter letter input mode
+    if (input_just_pressed(J_A)) {
+        Cell* cell = &current_puzzle.grid[cursor.y][cursor.x];
+        if (cell->solution != CELL_BLACK) {
+            if (cell->player_input >= 'A' && cell->player_input <= 'Z') {
+                letter_input_selection = cell->player_input - 'A';
+            } else {
+                letter_input_selection = 0;
+            }
+            clue_view_letter_input = 1;
+            current_state = STATE_LETTER_INPUT;
+            graphics_show_letter_input(letter_input_selection);
+        }
+    }
+
+    // B - delete letter
+    if (input_just_pressed(J_B)) {
+        delete_letter();
+        if (word_offset > 0) {
+            word_offset--;
+            update_cursor_from_clue();
+        }
+        graphics_update_clue_answer(clue, cursor.dir, &current_puzzle, word_offset);
+        autosave();
+    }
+
+    // SELECT or START - return to grid view
+    if (input_just_pressed(J_SELECT) || input_just_pressed(J_START)) {
         current_state = STATE_PLAYING;
         graphics_draw_grid(&current_puzzle, &view_offset);
         graphics_draw_cursor(&cursor, &view_offset);
-        const Clue* clue = get_current_clue();
         if (clue) {
             graphics_draw_clue(clue, cursor.dir);
         }
@@ -311,29 +358,51 @@ static void handle_letter_input_state(void) {
     if (input_just_pressed(J_A)) {
         enter_letter('A' + letter_input_selection);
         graphics_hide_letter_input();
-        move_in_word(1);  // Advance to next cell in word
-        current_state = STATE_PLAYING;
+
+        const Clue* clue = get_current_clue();
+
+        // Advance to next cell in word (unless at end)
+        if (clue && word_offset < clue->length - 1) {
+            move_in_word(1);
+        }
 
         // Auto-save progress
         autosave();
 
-        graphics_draw_grid(&current_puzzle, &view_offset);
-        graphics_draw_cursor(&cursor, &view_offset);
-
         // Check for completion
         if (game_check_complete()) {
             save_mark_complete(current_puzzle_index);
+            clue_view_letter_input = 0;
             current_state = STATE_COMPLETE;
             graphics_draw_complete();
+            return;
+        }
+
+        // Return to appropriate state
+        if (clue_view_letter_input) {
+            clue_view_letter_input = 0;
+            current_state = STATE_CLUE_VIEW;
+            graphics_draw_full_clue(clue, cursor.dir, &current_puzzle, word_offset);
+        } else {
+            current_state = STATE_PLAYING;
+            graphics_draw_grid(&current_puzzle, &view_offset);
+            graphics_draw_cursor(&cursor, &view_offset);
         }
     }
 
     // Cancel
     if (input_just_pressed(J_B)) {
         graphics_hide_letter_input();
-        current_state = STATE_PLAYING;
-        graphics_draw_grid(&current_puzzle, &view_offset);
-        graphics_draw_cursor(&cursor, &view_offset);
+        const Clue* clue = get_current_clue();
+        if (clue_view_letter_input) {
+            clue_view_letter_input = 0;
+            current_state = STATE_CLUE_VIEW;
+            graphics_draw_full_clue(clue, cursor.dir, &current_puzzle, word_offset);
+        } else {
+            current_state = STATE_PLAYING;
+            graphics_draw_grid(&current_puzzle, &view_offset);
+            graphics_draw_cursor(&cursor, &view_offset);
+        }
     }
 }
 
