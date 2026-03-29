@@ -18,24 +18,178 @@
         "E#S###O#I#I#S#L",
         "DATE#APOCALYPSE"
     ],
-    "across": [
-        {
-            "number": 1,
-            "clue": "Poorly made dial turned out to be not digital (6)",
-            "answer": "RADIAL"
-        }
-    ],
-    "down": [
-        {
-            "number": 1,
-            "clue": "Emit waves from communication device (5)",
-            "answer": "RADIATE"
-        },
-        {
-            "number": 2,
-            "clue": "Used in court, it rings when you dial (5)",
-            "answer": "TRIAL"
-        }
-    ],
-    "notes": "This is a complete grid, but clues are still to fill in."
+  "across": [
+    {
+      "number": 1,
+      "clue": "I enter football club in warlike mood, start off pretending (10)",
+      "answer": "ARTIFICIAL"
+    },
+    {
+      "number": 6,
+      "clue": "Discuss a hundred-odd hearts (4)",
+      "answer": "CHAT"
+    },
+    {
+      "number": 9,
+      "clue": "Prominent trade worker (9)",
+      "answer": "IMPORTANT"
+    },
+    {
+      "number": 10,
+      "clue": "Gloomy nut freaks out on lithium (5)",
+      "answer": "UNLIT"
+    },
+    {
+      "number": 11,
+      "clue": "Older person lasts to samba step (3)",
+      "answer": "OAP"
+    },
+    {
+      "number": 13,
+      "clue": "How I\u2019d thought to contain scope (5)",
+      "answer": "WIDTH"
+    },
+    {
+      "number": 14,
+      "clue": "Stop employ after assistant (5)",
+      "answer": "PAUSE"
+    },
+    {
+      "number": 15,
+      "clue": "Average German follows standard way of working (4)",
+      "answer": "MODE"
+    },
+    {
+      "number": 16,
+      "clue": "Grand artist read out work written by fan, a type of novel (7)",
+      "answer": "GRAPHIC"
+    },
+    {
+      "number": 18,
+      "clue": "Jolly about mega order being withdrawn by portable console (4, 3)",
+      "answer": "GAME BOY"
+    },
+    {
+      "number": 19,
+      "clue": "The Spanish back an inclination (4)",
+      "answer": "LEAN"
+    },
+    {
+      "number": 23,
+      "clue": "Rifle through morning rooms endlessly for bitter thing to swallow (5)",
+      "answer": "AMARO"
+    },
+    {
+      "number": 24,
+      "clue": "Kazakh mercenary smuggles Cambodian (5)",
+      "answer": "KHMER"
+    },
+    {
+      "number": 25,
+      "clue": "Age of queen, at first (3)",
+      "answer": "ERA"
+    },
+    {
+      "number": 27,
+      "clue": "Mistakenly take short run of wins (3,6)",
+      "answer": "HOT STREAK"
+    },
+    {
+      "number": 30,
+      "clue": "Palm off a ted (4)",
+      "answer": "DATE"
+    },
+    {
+      "number": 31,
+      "clue": "A scaly pope bastardised Revelations (10)",
+      "answer": "APOCALYPSE"
+    },
+    {
+      "number": 36,
+      "clue": "Saffron I parcel out, special price not holding (5)",
+      "answer": "SPICE"
+    }
+  ],
+  "down": [
+    {
+      "number": 1,
+      "clue": "Writer of fantastical movies gave note for lead actor (6)",
+      "answer": "ASIMOV"
+    },
+    {
+      "number": 2,
+      "clue": "Pat back and forth? (3)",
+      "answer": "TAP"
+    },
+    {
+      "number": 3,
+      "clue": "Odds of flier making tree (3)",
+      "answer": "FIR"
+    },
+    {
+      "number": 4,
+      "clue": "Monet about to exclaim \u201cGod!\u201d (6)",
+      "answer": "CLAUDE"
+    },
+    {
+      "number": 5,
+      "clue": "Blows air on the Batman (8)",
+      "answer": "ANTIHERO"
+    },
+    {
+      "number": 7,
+      "clue": "See things are messed up, I launch late (11)",
+      "answer": "HALLUCINATE"
+    },
+    {
+      "number": 8,
+      "clue": "Donations to church \u2013 model it health economics style, to begin with (6)",
+      "answer": "TITHES"
+    },
+    {
+      "number": 10,
+      "clue": "Disliked posh juice pulp on a second try (9)",
+      "answer": "UNPOPULAR"
+    },
+    {
+      "number": 12,
+      "clue": "In favour of resigned type loudly going after new advocate for children",
+      "answer": "PRONATALIST"
+    },
+    {
+      "number": 13,
+      "clue": "Loud clothes, for what reason? (9)",
+      "answer": "WHEREFORE"
+    },
+    {
+      "number": 17,
+      "clue": "Daunt logs what bunnies d\u200b\u200bo (8)",
+      "answer": "BOOKSHOP"
+    },
+    {
+      "number": 20,
+      "clue": "Back when speaking meant no action taken (6)",
+      "answer": "PASSED"
+    },
+    {
+      "number": 21,
+      "clue": "Makes you sick? Even celiac takes force (6)",
+      "answer": "EMETIC"
+    },
+    {
+      "number": 22,
+      "clue": "Irritate leg joint post-run (6)",
+      "answer": "RANKLE"
+    },
+    {
+      "number": 28,
+      "clue": "Before I enter the timeline (3)",
+      "answer": "TIL"
+    },
+    {
+      "number": 29,
+      "clue": "Record without second psychic power (3)",
+      "answer": "ESP"
+    }
+  ]
 }

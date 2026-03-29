@@ -326,6 +326,58 @@ void graphics_draw_pause_menu(uint8_t selected_option) {
     move_sprite(0, 0, 0);
 }
 
+void graphics_draw_full_clue(const Clue* clue, Direction dir) {
+    // Clear screen
+    for (uint8_t y = 0; y < SCREEN_TILES_Y; y++) {
+        for (uint8_t x = 0; x < SCREEN_TILES_X; x++) {
+            screen_buffer[y][x] = TILE_SPACE;
+        }
+    }
+
+    if (clue == NULL || clue->text == NULL) {
+        set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
+        move_sprite(0, 0, 0);
+        return;
+    }
+
+    // Draw clue number and direction at top (e.g., "12 ACROSS")
+    uint8_t x_pos = 1;
+    if (clue->number >= 10) {
+        screen_buffer[1][x_pos++] = TILE_NUMBER_0 + (clue->number / 10);
+    }
+    screen_buffer[1][x_pos++] = TILE_NUMBER_0 + (clue->number % 10);
+    x_pos++;  // Space
+
+    const char* dir_text = (dir == DIR_ACROSS) ? "ACROSS" : "DOWN";
+    for (uint8_t i = 0; dir_text[i] != '\0'; i++) {
+        screen_buffer[1][x_pos++] = char_to_tile(dir_text[i]);
+    }
+
+    // Draw clue text with word wrap starting at row 4
+    const char* text = clue->text;
+    uint8_t row = 4;
+    x_pos = 1;
+
+    while (*text != '\0' && row < SCREEN_TILES_Y - 2) {
+        if (x_pos >= SCREEN_TILES_X - 1) {
+            // Wrap to next line
+            row++;
+            x_pos = 1;
+            if (row >= SCREEN_TILES_Y - 2) break;
+        }
+
+        screen_buffer[row][x_pos] = char_to_tile(*text);
+        x_pos++;
+        text++;
+    }
+
+    // Copy to VRAM
+    set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
+
+    // Hide cursor sprite
+    move_sprite(0, 0, 0);
+}
+
 void graphics_draw_cell(uint8_t screen_x, uint8_t screen_y, const Cell* cell, uint8_t is_cursor) {
     uint8_t tile;
 

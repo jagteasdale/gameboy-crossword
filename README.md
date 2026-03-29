@@ -29,12 +29,12 @@ A cryptic crossword game for the original Nintendo Game Boy, designed to run on 
 
 1. Install GBDK-2020 and set the path:
    ```bash
-   export GBDK_HOME=/path/to/gbdk
+   export GBDK_HOME=/Applications/gbdk
    ```
 
 2. Build the ROM:
    ```bash
-   make
+   make clean && make
    ```
 
 3. Run in emulator:

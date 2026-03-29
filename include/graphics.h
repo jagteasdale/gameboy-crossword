@@ -70,6 +70,9 @@ void graphics_show_letter_input(uint8_t selected_letter);
 // Hide the letter input overlay
 void graphics_hide_letter_input(void);
 
+// Draw full clue popup (fullscreen overlay)
+void graphics_draw_full_clue(const Clue* clue, Direction dir);
+
 // Helper to convert ASCII to tile index
 uint8_t char_to_tile(char c);
 

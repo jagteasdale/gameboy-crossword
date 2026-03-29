@@ -39,7 +39,6 @@ static void update_cursor_from_clue(void);
 static void next_clue(void);
 static void prev_clue(void);
 static void move_in_word(int8_t delta);
-static void toggle_direction(void);
 static const Clue* get_current_clue(void);
 static void enter_letter(uint8_t letter);
 static void delete_letter(void);
@@ -223,10 +222,13 @@ static void handle_playing_state(void) {
         needs_redraw = 1;
     }
 
-    // SELECT - toggle direction (across/down)
+    // SELECT - show full clue popup
     if (input_just_pressed(J_SELECT)) {
-        toggle_direction();
-        needs_redraw = 1;
+        const Clue* clue = get_current_clue();
+        if (clue) {
+            current_state = STATE_CLUE_VIEW;
+            graphics_draw_full_clue(clue, cursor.dir);
+        }
     }
 
     // START - pause menu
@@ -251,10 +253,15 @@ static void handle_playing_state(void) {
 
 static void handle_clue_view_state(void) {
     // Full clue view - press any button to return
-    if (input_just_pressed(J_A) || input_just_pressed(J_B)) {
+    if (input_just_pressed(J_A) || input_just_pressed(J_B) ||
+        input_just_pressed(J_SELECT) || input_just_pressed(J_START)) {
         current_state = STATE_PLAYING;
         graphics_draw_grid(&current_puzzle, &view_offset);
         graphics_draw_cursor(&cursor, &view_offset);
+        const Clue* clue = get_current_clue();
+        if (clue) {
+            graphics_draw_clue(clue, cursor.dir);
+        }
     }
 }
 
@@ -461,16 +468,6 @@ static void move_in_word(int8_t delta) {
     }
 
     word_offset = new_offset;
-    update_cursor_from_clue();
-}
-
-static void toggle_direction(void) {
-    // Switch direction
-    cursor.dir = (cursor.dir == DIR_ACROSS) ? DIR_DOWN : DIR_ACROSS;
-
-    // Reset to first clue of new direction
-    current_clue_index = 0;
-    word_offset = 0;
     update_cursor_from_clue();
 }
 
