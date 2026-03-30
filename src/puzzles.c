@@ -118,7 +118,7 @@ static const Clue puzzle0_down_clues[] = {
     { 10, 10, 2, 9, puzzle0_clue_10d },
     { 12, 2, 4, 11, puzzle0_clue_12d },
     { 13, 4, 4, 9, puzzle0_clue_13d },
-    { 17, 0, 0, 1, puzzle0_clue_17d },
+    { 17, 6, 7, 8, puzzle0_clue_17d },
     { 20, 0, 9, 6, puzzle0_clue_20d },
     { 21, 8, 9, 6, puzzle0_clue_21d },
     { 22, 14, 9, 6, puzzle0_clue_22d },
