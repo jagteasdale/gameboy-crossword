@@ -63,6 +63,8 @@ typedef enum {
     STATE_CLUE_VIEW,
     STATE_LETTER_INPUT,
     STATE_PAUSED,
+    STATE_CHEAT_MENU,
+    STATE_CONFIRM_CLEAR,
     STATE_COMPLETE
 } GameState;
 

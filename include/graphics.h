@@ -49,11 +49,25 @@ void graphics_draw_complete(void);
 
 // Pause menu options
 #define PAUSE_OPTION_RESUME 0
-#define PAUSE_OPTION_QUIT   1
-#define PAUSE_OPTION_COUNT  2
+#define PAUSE_OPTION_CLEAR  1
+#define PAUSE_OPTION_CHEAT  2
+#define PAUSE_OPTION_QUIT   3
+#define PAUSE_OPTION_COUNT  4
+
+// Cheat submenu options
+#define CHEAT_OPTION_CHECK  0
+#define CHEAT_OPTION_REVEAL 1
+#define CHEAT_OPTION_BACK   2
+#define CHEAT_OPTION_COUNT  3
 
 // Draw pause menu overlay with selected option
 void graphics_draw_pause_menu(uint8_t selected_option);
+
+// Draw cheat submenu
+void graphics_draw_cheat_menu(uint8_t selected_option);
+
+// Draw clear confirmation dialog
+void graphics_draw_clear_confirm(uint8_t selected_option);
 
 // Draw a single cell
 void graphics_draw_cell(uint8_t screen_x, uint8_t screen_y, const Cell* cell, uint8_t is_cursor);

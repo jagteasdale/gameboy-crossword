@@ -101,6 +101,40 @@ void graphics_draw_grid(const Puzzle* puzzle, const ViewOffset* offset) {
         }
     }
 
+    // Draw control hints on right side (right-aligned, gap at col 15)
+    // Row 1: "A=IN" (4 chars, cols 16-19)
+    screen_buffer[1][16] = TILE_LETTER_A;
+    screen_buffer[1][17] = char_to_tile('=');
+    screen_buffer[1][18] = TILE_LETTER_A + ('I' - 'A');
+    screen_buffer[1][19] = TILE_LETTER_A + ('N' - 'A');
+    // Row 3: "B=DEL" (5 chars, cols 15-19)
+    screen_buffer[3][15] = TILE_LETTER_A + ('B' - 'A');
+    screen_buffer[3][16] = char_to_tile('=');
+    screen_buffer[3][17] = TILE_LETTER_A + ('D' - 'A');
+    screen_buffer[3][18] = TILE_LETTER_A + ('E' - 'A');
+    screen_buffer[3][19] = TILE_LETTER_A + ('L' - 'A');
+    // Row 6: "SEL=" (4 chars, cols 16-19)
+    screen_buffer[6][16] = TILE_LETTER_A + ('S' - 'A');
+    screen_buffer[6][17] = TILE_LETTER_A + ('E' - 'A');
+    screen_buffer[6][18] = TILE_LETTER_A + ('L' - 'A');
+    screen_buffer[6][19] = char_to_tile('=');
+    // Row 7: "VIEW" (4 chars, cols 16-19)
+    screen_buffer[7][16] = TILE_LETTER_A + ('V' - 'A');
+    screen_buffer[7][17] = TILE_LETTER_A + ('I' - 'A');
+    screen_buffer[7][18] = TILE_LETTER_A + ('E' - 'A');
+    screen_buffer[7][19] = TILE_LETTER_A + ('W' - 'A');
+    // Row 10: "STRT=" (5 chars, cols 15-19)
+    screen_buffer[10][15] = TILE_LETTER_A + ('S' - 'A');
+    screen_buffer[10][16] = TILE_LETTER_A + ('T' - 'A');
+    screen_buffer[10][17] = TILE_LETTER_A + ('R' - 'A');
+    screen_buffer[10][18] = TILE_LETTER_A + ('T' - 'A');
+    screen_buffer[10][19] = char_to_tile('=');
+    // Row 11: "MORE" (4 chars, cols 16-19)
+    screen_buffer[11][16] = TILE_LETTER_A + ('M' - 'A');
+    screen_buffer[11][17] = TILE_LETTER_A + ('O' - 'A');
+    screen_buffer[11][18] = TILE_LETTER_A + ('R' - 'A');
+    screen_buffer[11][19] = TILE_LETTER_A + ('E' - 'A');
+
     // Copy grid area to VRAM
     set_bkg_tiles(0, 0, SCREEN_TILES_X, GRID_VIEW_HEIGHT, (uint8_t*)screen_buffer);
 }
@@ -295,16 +329,16 @@ void graphics_draw_pause_menu(uint8_t selected_option) {
         }
     }
 
-    // Draw "PAUSED" header (centered at row 4)
+    // Draw "PAUSED" header (centered at row 2)
     const char* paused = "PAUSED";
     uint8_t paused_x = (SCREEN_TILES_X - 6) / 2;
     for (uint8_t i = 0; paused[i] != '\0'; i++) {
-        screen_buffer[4][paused_x + i] = char_to_tile(paused[i]);
+        screen_buffer[2][paused_x + i] = char_to_tile(paused[i]);
     }
 
-    // Menu options starting at row 8
-    const char* options[] = { "RESUME", "BACK" };
-    uint8_t option_rows[] = { 8, 10 };
+    // Menu options
+    const char* options[] = { "RESUME", "CLEAR", "CHEAT", "BACK" };
+    uint8_t option_rows[] = { 5, 7, 9, 11 };
 
     for (uint8_t i = 0; i < PAUSE_OPTION_COUNT; i++) {
         uint8_t row = option_rows[i];
@@ -326,6 +360,89 @@ void graphics_draw_pause_menu(uint8_t selected_option) {
     set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
 
     // Hide cursor sprite
+    move_sprite(0, 0, 0);
+}
+
+void graphics_draw_cheat_menu(uint8_t selected_option) {
+    // Clear screen
+    for (uint8_t y = 0; y < SCREEN_TILES_Y; y++) {
+        for (uint8_t x = 0; x < SCREEN_TILES_X; x++) {
+            screen_buffer[y][x] = TILE_SPACE;
+        }
+    }
+
+    // Draw "CHEAT" header
+    const char* header = "CHEAT";
+    uint8_t header_x = (SCREEN_TILES_X - 5) / 2;
+    for (uint8_t i = 0; header[i] != '\0'; i++) {
+        screen_buffer[2][header_x + i] = char_to_tile(header[i]);
+    }
+
+    // Menu options
+    const char* options[] = { "CHECK", "REVEAL", "BACK" };
+    uint8_t option_rows[] = { 5, 7, 9 };
+
+    for (uint8_t i = 0; i < CHEAT_OPTION_COUNT; i++) {
+        uint8_t row = option_rows[i];
+        uint8_t text_x = 5;
+
+        if (i == selected_option) {
+            screen_buffer[row][3] = TILE_ARROW_RIGHT;
+        }
+
+        const char* text = options[i];
+        for (uint8_t j = 0; text[j] != '\0'; j++) {
+            screen_buffer[row][text_x + j] = char_to_tile(text[j]);
+        }
+    }
+
+    // Copy to VRAM
+    set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
+    move_sprite(0, 0, 0);
+}
+
+void graphics_draw_clear_confirm(uint8_t selected_option) {
+    // Clear screen
+    for (uint8_t y = 0; y < SCREEN_TILES_Y; y++) {
+        for (uint8_t x = 0; x < SCREEN_TILES_X; x++) {
+            screen_buffer[y][x] = TILE_SPACE;
+        }
+    }
+
+    // Draw warning message
+    const char* line1 = "CLEAR ALL";
+    const char* line2 = "LETTERS?";
+    uint8_t x1 = (SCREEN_TILES_X - 9) / 2;
+    uint8_t x2 = (SCREEN_TILES_X - 8) / 2;
+    for (uint8_t i = 0; line1[i] != '\0'; i++) {
+        screen_buffer[3][x1 + i] = char_to_tile(line1[i]);
+    }
+    for (uint8_t i = 0; line2[i] != '\0'; i++) {
+        screen_buffer[4][x2 + i] = char_to_tile(line2[i]);
+    }
+
+    // Options: YES / NO
+    const char* yes = "YES";
+    const char* no = "NO";
+
+    // YES at row 7
+    if (selected_option == 0) {
+        screen_buffer[7][5] = TILE_ARROW_RIGHT;
+    }
+    for (uint8_t i = 0; yes[i] != '\0'; i++) {
+        screen_buffer[7][7 + i] = char_to_tile(yes[i]);
+    }
+
+    // NO at row 9
+    if (selected_option == 1) {
+        screen_buffer[9][5] = TILE_ARROW_RIGHT;
+    }
+    for (uint8_t i = 0; no[i] != '\0'; i++) {
+        screen_buffer[9][7 + i] = char_to_tile(no[i]);
+    }
+
+    // Copy to VRAM
+    set_bkg_tiles(0, 0, SCREEN_TILES_X, SCREEN_TILES_Y, (uint8_t*)screen_buffer);
     move_sprite(0, 0, 0);
 }
 

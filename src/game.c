@@ -34,6 +34,8 @@ static void handle_playing_state(void);
 static void handle_clue_view_state(void);
 static void handle_letter_input_state(void);
 static void handle_paused_state(void);
+static void handle_cheat_menu_state(void);
+static void handle_confirm_clear_state(void);
 static void handle_complete_state(void);
 
 // Helper functions
@@ -45,6 +47,13 @@ static const Clue* get_current_clue(void);
 static void enter_letter(uint8_t letter);
 static void delete_letter(void);
 static void autosave(void);
+static void check_current_word(void);
+static void reveal_current_word(void);
+static void clear_all_letters(void);
+
+// Cheat menu selection
+static uint8_t cheat_menu_selection;
+static uint8_t clear_confirm_selection;
 
 void game_init(void) {
     current_state = STATE_TITLE;
@@ -80,6 +89,12 @@ void game_update(void) {
             break;
         case STATE_PAUSED:
             handle_paused_state();
+            break;
+        case STATE_CHEAT_MENU:
+            handle_cheat_menu_state();
+            break;
+        case STATE_CONFIRM_CLEAR:
+            handle_confirm_clear_state();
             break;
         case STATE_COMPLETE:
             handle_complete_state();
@@ -431,6 +446,16 @@ static void handle_paused_state(void) {
             if (clue) {
                 graphics_draw_clue(clue, cursor.dir);
             }
+        } else if (pause_menu_selection == PAUSE_OPTION_CLEAR) {
+            // Show clear confirmation
+            clear_confirm_selection = 1;  // Default to NO
+            current_state = STATE_CONFIRM_CLEAR;
+            graphics_draw_clear_confirm(clear_confirm_selection);
+        } else if (pause_menu_selection == PAUSE_OPTION_CHEAT) {
+            // Enter cheat submenu
+            cheat_menu_selection = 0;
+            current_state = STATE_CHEAT_MENU;
+            graphics_draw_cheat_menu(cheat_menu_selection);
         } else if (pause_menu_selection == PAUSE_OPTION_QUIT) {
             // Save progress and return to menu
             autosave();
@@ -448,6 +473,95 @@ static void handle_paused_state(void) {
         if (clue) {
             graphics_draw_clue(clue, cursor.dir);
         }
+    }
+}
+
+static void handle_cheat_menu_state(void) {
+    // Navigate menu
+    if (input_just_pressed(J_UP)) {
+        if (cheat_menu_selection > 0) {
+            cheat_menu_selection--;
+            graphics_draw_cheat_menu(cheat_menu_selection);
+        }
+    }
+    if (input_just_pressed(J_DOWN)) {
+        if (cheat_menu_selection < CHEAT_OPTION_COUNT - 1) {
+            cheat_menu_selection++;
+            graphics_draw_cheat_menu(cheat_menu_selection);
+        }
+    }
+
+    // Select option
+    if (input_just_pressed(J_A)) {
+        if (cheat_menu_selection == CHEAT_OPTION_CHECK) {
+            check_current_word();
+            autosave();
+            // Return to playing
+            current_state = STATE_PLAYING;
+            graphics_draw_grid(&current_puzzle, &view_offset);
+            graphics_draw_cursor(&cursor, &view_offset);
+            const Clue* clue = get_current_clue();
+            if (clue) {
+                graphics_draw_clue(clue, cursor.dir);
+            }
+        } else if (cheat_menu_selection == CHEAT_OPTION_REVEAL) {
+            reveal_current_word();
+            autosave();
+            // Return to playing and check completion
+            current_state = STATE_PLAYING;
+            graphics_draw_grid(&current_puzzle, &view_offset);
+            graphics_draw_cursor(&cursor, &view_offset);
+            const Clue* clue = get_current_clue();
+            if (clue) {
+                graphics_draw_clue(clue, cursor.dir);
+            }
+            if (game_check_complete()) {
+                save_mark_complete(current_puzzle_index);
+                current_state = STATE_COMPLETE;
+                graphics_draw_complete();
+            }
+        } else if (cheat_menu_selection == CHEAT_OPTION_BACK) {
+            // Return to pause menu
+            current_state = STATE_PAUSED;
+            graphics_draw_pause_menu(pause_menu_selection);
+        }
+    }
+
+    // B goes back to pause menu
+    if (input_just_pressed(J_B)) {
+        current_state = STATE_PAUSED;
+        graphics_draw_pause_menu(pause_menu_selection);
+    }
+}
+
+static void handle_confirm_clear_state(void) {
+    // Navigate YES/NO
+    if (input_just_pressed(J_UP) || input_just_pressed(J_DOWN)) {
+        clear_confirm_selection = 1 - clear_confirm_selection;
+        graphics_draw_clear_confirm(clear_confirm_selection);
+    }
+
+    // Select
+    if (input_just_pressed(J_A)) {
+        if (clear_confirm_selection == 0) {
+            // YES - clear all letters
+            clear_all_letters();
+            autosave();
+        }
+        // Return to playing either way
+        current_state = STATE_PLAYING;
+        graphics_draw_grid(&current_puzzle, &view_offset);
+        graphics_draw_cursor(&cursor, &view_offset);
+        const Clue* clue = get_current_clue();
+        if (clue) {
+            graphics_draw_clue(clue, cursor.dir);
+        }
+    }
+
+    // B cancels
+    if (input_just_pressed(J_B)) {
+        current_state = STATE_PAUSED;
+        graphics_draw_pause_menu(pause_menu_selection);
     }
 }
 
@@ -551,4 +665,48 @@ static void delete_letter(void) {
 static void autosave(void) {
     save_puzzle(current_puzzle_index, &current_puzzle,
                 current_clue_index, word_offset, cursor.dir);
+}
+
+static void check_current_word(void) {
+    // Remove incorrect letters from current word
+    const Clue* clue = get_current_clue();
+    if (clue == NULL) return;
+
+    for (uint8_t i = 0; i < clue->length; i++) {
+        uint8_t cell_x = clue->start_x + (cursor.dir == DIR_ACROSS ? i : 0);
+        uint8_t cell_y = clue->start_y + (cursor.dir == DIR_DOWN ? i : 0);
+        Cell* cell = &current_puzzle.grid[cell_y][cell_x];
+
+        // If player input doesn't match solution, clear it
+        if (cell->player_input != CELL_EMPTY &&
+            cell->player_input != cell->solution) {
+            cell->player_input = CELL_EMPTY;
+        }
+    }
+}
+
+static void reveal_current_word(void) {
+    // Fill in current word with solution
+    const Clue* clue = get_current_clue();
+    if (clue == NULL) return;
+
+    for (uint8_t i = 0; i < clue->length; i++) {
+        uint8_t cell_x = clue->start_x + (cursor.dir == DIR_ACROSS ? i : 0);
+        uint8_t cell_y = clue->start_y + (cursor.dir == DIR_DOWN ? i : 0);
+        Cell* cell = &current_puzzle.grid[cell_y][cell_x];
+
+        cell->player_input = cell->solution;
+    }
+}
+
+static void clear_all_letters(void) {
+    // Clear all player input from the grid
+    for (uint8_t y = 0; y < GRID_HEIGHT; y++) {
+        for (uint8_t x = 0; x < GRID_WIDTH; x++) {
+            Cell* cell = &current_puzzle.grid[y][x];
+            if (cell->solution != CELL_BLACK) {
+                cell->player_input = CELL_EMPTY;
+            }
+        }
+    }
 }
