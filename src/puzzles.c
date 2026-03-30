@@ -64,7 +64,7 @@ static const char puzzle0_clue_25a[] = "Age of queen, at first (3)";
 static const char puzzle0_clue_27a[] = "Mistakenly take short run of wins (3,6)";
 static const char puzzle0_clue_30a[] = "Palm off a ted (4)";
 static const char puzzle0_clue_31a[] = "A scaly pope bastardised Revelations (10)";
-static const char puzzle0_clue_36a[] = "Saffron I parcel out, special price not holding (5)";
+static const char puzzle0_clue_26a[] = "Saffron I parcel out, special price not holding (5)";
 
 // Down clues
 static const char puzzle0_clue_1d[] = "Writer of fantastical movies gave note for lead actor (6)";
@@ -100,10 +100,10 @@ static const Clue puzzle0_across_clues[] = {
     { 23, 0, 10, 5, puzzle0_clue_23a },
     { 24, 6, 10, 5, puzzle0_clue_24a },
     { 25, 12, 10, 3, puzzle0_clue_25a },
+    { 26, 0, 12, 1, puzzle0_clue_26a },
     { 27, 6, 12, 9, puzzle0_clue_27a },
     { 30, 0, 14, 4, puzzle0_clue_30a },
     { 31, 5, 14, 10, puzzle0_clue_31a },
-    { 36, 0, 0, 1, puzzle0_clue_36a },
 };
 
 // Down clue array
